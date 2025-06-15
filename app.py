@@ -1,5 +1,3 @@
-
-
 from models import db, User
 from flask import Flask, request, jsonify, render_template
 from flask import session
@@ -7,7 +5,6 @@ from flask import redirect
 from flask import url_for
 from flask import flash
 import re
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "xinchao_secure_key_2025"
@@ -79,10 +76,46 @@ def validate_email(email):
     return False
 
 def validate_password(password):
-    return
+    """Mật khẩu tối thiểu 6 ký tự, có ít nhất 1 chữ cái và 1 số"""
+    if len(password) < 6:
+        return False
+    if not re.search(r"[A-Za-z]", password):
+        return False
+    if not re.search(r"[0-9]", password):
+        return False
+    return True
+
 def validate_username(username):
-    return
-#Log in
-#Trang chinh khi nguoi dung dang nhap
-#Profile page
-#Dang xuat
+    """Chỉ cho phép chữ cái, số và dấu gạch dưới"""
+    return re.match(r'^\w+$', username) is not None
+
+
+# 2. ĐĂNG NHẬP
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+
+    username = data.get("username")
+    password = data.get("password")
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"error": "Tên người dùng không tồn tại"}), 400
+
+    if not user.check_password(password):
+        return jsonify({"error": "Mật khẩu không chính xác"}), 400
+
+    if not user.is_active:
+        return jsonify({"error": "Tài khoản bị khóa hoặc không hoạt động"}), 403
+
+    # Cập nhật phiên đăng nhập
+    user.update_last_login()
+    session["user_id"] = user.id
+
+    return jsonify({"message": "Đăng nhập thành công", "user": user.to_dict()}), 200
+
+# 3. ĐĂNG XUẤT
+@app.route("/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({"message": "Đăng xuất thành công"}), 200
