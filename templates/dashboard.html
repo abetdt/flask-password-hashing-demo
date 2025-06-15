@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Chào {{ user.username }}!</h2>
+    <p>Email: {{ user.email }}</p>
+    <h3>Dịch vụ đã lưu</h3>
+    <form method="POST" action="{{ url_for('add_service') }}">
+        <label for="service_name">Tên dịch vụ:</label><br>
+        <input type="text" id="service_name" name="service_name" required><br>
+        <label for="service_username">Tên đăng nhập dịch vụ:</label><br>
+        <input type="text" id="service_username" name="service_username" required><br>
+        <label for="service_password">Mật khẩu dịch vụ:</label><br>
+        <input type="password" id="service_password" name="service_password" required><br>
+        <button type="submit">Thêm dịch vụ</button>
+    </form>
+    <ul>
+        {% for service in user.services %}
+            <li>{{ service.service_name }} - {{ service.service_username }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
