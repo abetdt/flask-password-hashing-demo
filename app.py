@@ -1,88 +1,89 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+from models import db, User, Service
+from dotenv import load_dotenv
+import os
 
-
-from models import db, User
-from flask import Flask, request, jsonify, render_template
-from flask import session
-from flask import redirect
-from flask import url_for
-from flask import flash
-import re
-
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "xinchao_secure_key_2025"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'hi')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Sử dụng SQLite cho đơn giản
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-#Khoi tao database
 db.init_app(app)
 
-# Tao tat ca table dc dinh nghia models
-# Chi tao table chua ton tai
+# Tạo database
 with app.app_context():
     db.create_all()
 
-#Home page
-@app.route("/")
+@app.route('/')
 def home():
-    # Kiểm tra user_id có hợp lệ không
-    if "user_id" in session:
-        try:
-            user_id = session["user_id"]
-            user = User.query.get(user_id)
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
 
-            #Neu user khong ton tai, khong active
-            if not user or not user.is_active:
-                session.clear()
-                flash("Phien dang nhap khong hop le. Vui long dang nhap lai:", "waring")
-                return render_template("home.html")
-            return redirect(url_for("dashboard"))
-        except Exception as e:
-            # Log error và clear session
-            app.logger.error(f"Error checking user session: {e}")
-            session.clear()
-            return render_template("home.html")
-    return render_template("home.html")
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.find_by_username(username)
+        if user and user.verify_password(password):
+            session['user_id'] = user.id
+            flash('Đăng nhập thành công!', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Tên đăng nhập hoặc mật khẩu sai.', 'error')
+    return render_template('login.html')
 
-#Sign up
-# 1. TẠO USER MỚI
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    data = request.get_json()
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        if User.find_by_username(username) or User.find_by_email(email):
+            flash('Tên đăng nhập hoặc email đã tồn tại.', 'error')
+        else:
+            user = User(username=username, email=email)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+            flash('Đăng ký thành công! Vui lòng đăng nhập.', 'success')
+            return redirect(url_for('login'))
+    return render_template('register.html')
 
-    # Kiểm tra user đã tồn tại chưa
-    existing_user = User.query.filter_by(username=data['username']).first()
-    if existing_user:
-        return jsonify({'error': 'Username đã tồn tại'}), 400
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        flash('Vui lòng đăng nhập.', 'error')
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    return render_template('dashboard.html', user=user)
 
-    # Tạo user mới
-    new_user = User(
-        username=data['username'],
-        email=data['email']
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('Đã đăng xuất.', 'success')
+    return redirect(url_for('login'))
+
+@app.route('/add_service', methods=['POST'])
+def add_service():
+    if 'user_id' not in session:
+        flash('Vui lòng đăng nhập.', 'error')
+        return redirect(url_for('login'))
+    user = User.query.get(session['user_id'])
+    service = Service(
+        user_id=user.id,
+        service_name=request.form['service_name'],
+        service_username=request.form['service_username']
     )
-    new_user.set_password(data['password'])  # Hash password
-
-    # Lưu vào database
-    db.session.add(new_user)
+    service.set_service_password(request.form['service_password'], user.password_hash)
+    db.session.add(service)
     db.session.commit()
+    flash('Thêm dịch vụ thành công!', 'success')
+    return redirect(url_for('dashboard'))
 
-    return jsonify({'message': 'Đăng ký thành công', 'user': new_user.to_dict()}), 201
-
-#Hepler functions
-def validate_email(email):
-    """Validate email format"""
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-
-    match = re.match(pattern, email)
-    if match is not None:
-        return True
-    return False
-
-def validate_password(password):
-    return
-def validate_username(username):
-    return
-#Log in
-#Trang chinh khi nguoi dung dang nhap
-#Profile page
-#Dang xuat
+if __name__ == '__main__':
+    app.run(debug=True)

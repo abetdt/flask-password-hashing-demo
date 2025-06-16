@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Đăng ký</h2>
+    <form method="POST" action="{{ url_for('register') }}">
+        <label for="username">Tên đăng nhập:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <label for="password">Mật khẩu:</label><br>
+        <div style="position: relative;">
+            <input type="password" id="password" name="password" required oninput="checkPassword()">
+            <button type="button" id="toggle-password" onclick="togglePassword('password', 'toggle-password')">Hiển thị</button>
+        </div>
+        <p id="password-strength"></p>
+        <button type="button" onclick="generatePassword()">Gợi ý mật khẩu</button><br>
+        <button type="submit">Đăng ký</button>
+    </form>
+    <p>Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a></p>
+{% endblock %}
