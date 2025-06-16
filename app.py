@@ -42,6 +42,7 @@ def login():
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
+
 def register():
     # Kiểm tra nếu user đã đăng nhập thì redirect về dashboard
     if 'user_id' in session:
@@ -180,4 +181,5 @@ def delete_service(service_id):
 
 
 if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
     app.run(debug=True, host='0.0.0.0', port=5000)
