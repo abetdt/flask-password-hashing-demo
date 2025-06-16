@@ -51,7 +51,7 @@ button:hover {
 .success { color: green; }
 .error { color: red; }
 
-/* Style cho nút toggle */
+/* Style cho nút toggle
 #toggle-password {
     position: absolute;
     right: 10px;
@@ -62,4 +62,10 @@ button:hover {
     background-color: #ddd;
     border: 1px solid #ccc;
     cursor: pointer;
-}
+} */
+ /* Thêm css cho thong báo lỗi*/
+ .error-text {
+    color: #ff4444;
+    font-size: 12px;
+    margin: 5px 0;
+ }

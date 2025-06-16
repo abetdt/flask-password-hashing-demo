@@ -25,6 +25,10 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Kiểm tra nếu user đã đăng nhập thì redirect về dashboard
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -38,7 +42,12 @@ def login():
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
+
 def register():
+    # Kiểm tra nếu user đã đăng nhập thì redirect về dashboard
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -73,17 +82,104 @@ def add_service():
     if 'user_id' not in session:
         flash('Vui lòng đăng nhập.', 'error')
         return redirect(url_for('login'))
+
     user = User.query.get(session['user_id'])
+
+    # Tạo service mới
     service = Service(
         user_id=user.id,
         service_name=request.form['service_name'],
-        service_username=request.form['service_username']
+        service_username=request.form['service_username'],
+        service_url=request.form.get('service_url', ''),     # nếu có input này
+        notes=request.form.get('service_note', '')           # sửa lại từ 'note' → 'notes'
     )
+
+    # Mã hoá mật khẩu
     service.set_service_password(request.form['service_password'], user.password_hash)
+
+    # Lưu vào DB
     db.session.add(service)
     db.session.commit()
+
     flash('Thêm dịch vụ thành công!', 'success')
     return redirect(url_for('dashboard'))
 
+
+@app.route('/edit_service/<int:service_id>', methods=['GET', 'POST'])
+def edit_service(service_id):
+    if 'user_id' not in session:
+        flash('Vui lòng đăng nhập.', 'error')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    service = Service.query.get(service_id)
+
+    if service is None or service.user_id != user.id:
+        flash('Dịch vụ không tồn tại.', 'error')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        service.service_name = request.form['service_name']
+        service.service_username = request.form['service_username']
+        service.notes = request.form.get('service_note', '')  # ✅ đổi note → notes
+        service.set_service_password(request.form['service_password'], user.password_hash)
+        db.session.commit()
+
+        flash('Cập nhật dịch vụ thành công!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('edit_service.html', user=user, service=service)
+
+
+@app.route("/service/<int:service_id>")
+def service_detail(service_id):
+    if 'user_id' not in session:
+        flash('Vui lòng đăng nhập.', 'error')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    service = Service.query.get(service_id)
+
+    # ✅ Kiểm tra thêm cả is_active
+    if service is None or service.user_id != user.id or not service.is_active:
+        flash('Dịch vụ không tồn tại.', 'error')
+        return redirect(url_for('dashboard'))
+
+    # ✅ Giải mã mật khẩu và gửi sang template
+    decrypted_password = service.get_service_password(user.password_hash)
+    print(f"Decrypted password for service {service_id}: {decrypted_password}")
+    return render_template(
+        'service_detail.html',
+        user=user,
+        service=service,
+        decrypted_password=decrypted_password
+    )
+
+
+
+
+@app.route('/delete_service/<int:service_id>', methods=['POST'])
+def delete_service(service_id):
+    if 'user_id' not in session:
+        flash('Vui lòng đăng nhập.', 'error')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    service = Service.query.get(service_id)
+
+    if service is None or service.user_id != user.id:
+        flash('Dịch vụ không tồn tại hoặc bạn không có quyền xoá.', 'error')
+        return redirect(url_for('dashboard'))
+
+    # ✅ Xóa mềm: chỉ đổi cờ is_active
+    service.is_active = False
+    db.session.commit()
+
+    flash('Dịch vụ đã được ẩn khỏi danh sách (xóa mềm).', 'success')
+    return redirect(url_for('dashboard'))
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
