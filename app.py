@@ -25,6 +25,9 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Kiểm tra nếu user đã đăng nhập thì redirect về dashboard
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -38,7 +41,11 @@ def login():
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
+
 def register():
+    # Kiểm tra nếu user đã đăng nhập thì redirect về dashboard
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -86,4 +93,4 @@ def add_service():
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
