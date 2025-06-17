@@ -6,6 +6,7 @@ import os
 
 load_dotenv()
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'hi')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Sử dụng SQLite cho đơn giản
@@ -182,4 +183,4 @@ def delete_service(service_id):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+
