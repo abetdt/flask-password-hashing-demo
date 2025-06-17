@@ -4,7 +4,7 @@ import os
 import logging
 
 from dotenv import load_dotenv
-load_dotenv()  # Load biến môi trường từ file .env.example
+load_dotenv()  # Load biến môi trường từ file .env
 
 logger = logging.getLogger(__name__)
 
