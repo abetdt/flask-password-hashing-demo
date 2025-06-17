@@ -1,5 +1,3 @@
-
-
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import bcrypt
@@ -9,7 +7,7 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 from dotenv import load_dotenv
-load_dotenv()  # Tự động load từ file .env
+load_dotenv()  # Tự động load từ file .env.example
 
 db = SQLAlchemy()
 def kiem_tra_moi_truong_chay() -> bool:
