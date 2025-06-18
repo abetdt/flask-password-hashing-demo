@@ -73,8 +73,9 @@ PASSWORD_PEPPER=your-pepper-here
 DATABASE_URL=sqlite:///password_manager.db
 FLASK_ENV=development
 ```
+4. **Sửa file .env.example thành .env:**
 
-4. **Chạy ứng dụng:**
+5. **Chạy ứng dụng:**
 ```bash
 python run.py
 ```
