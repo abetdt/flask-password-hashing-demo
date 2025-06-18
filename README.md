@@ -1,34 +1,164 @@
-# Flask App: Ứng dụng Hàm Băm để Quản Lý Mật Khẩu
+# Flask Password Manager
 
-##  Giới thiệu
+Ứng dụng quản lý mật khẩu được xây dựng bằng Flask với tính năng mã hóa bảo mật.
 
-Đây là một ứng dụng web đơn giản được xây dựng bằng Flask, mô phỏng cách sử dụng hàm băm (hash function) để bảo vệ mật khẩu người dùng.
+## Cấu trúc Project
 
-## Tính năng chính
+```
+flask-password-hashing-demo/
+├── app/                          # Package chính của ứng dụng
+│   ├── __init__.py              # Application factory
+│   ├── config/                  # Cấu hình ứng dụng
+│   │   ├── __init__.py
+│   │   └── config.py           # Các class cấu hình
+│   ├── models/                  # Database models
+│   │   ├── __init__.py
+│   │   ├── user.py             # User model
+│   │   └── service.py          # Service model
+│   ├── services/               # Business logic services
+│   │   ├── __init__.py
+│   │   ├── auth_service.py     # Authentication logic
+│   │   └── password_service.py # Password management logic
+│   ├── utils/                  # Utility functions
+│   │   ├── __init__.py
+│   │   ├── encryption.py       # Encryption utilities
+│   │   └── password_utils.py   # Password hashing utilities
+│   ├── views/                  # Route handlers (Blueprints)
+│   │   ├── __init__.py
+│   │   ├── auth.py            # Authentication routes
+│   │   ├── dashboard.py       # Dashboard routes
+│   │   └── services.py        # Service management routes
+│   ├── static/                 # Static files (CSS, JS, images)
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── images/
+│   └── templates/              # HTML templates
+│       ├── auth/              # Authentication templates
+│       ├── dashboard/         # Dashboard templates
+│       └── services/          # Service templates
+├── venv/                      # Virtual environment
+├── requirements.txt           # Python dependencies
+├── run.py                    # Application entry point
+└── README.md                 # Project documentation
+```
 
-- Đăng ký tài khoản (hash mật khẩu trước khi lưu)
-- Đăng nhập (so sánh mật khẩu đã hash)
-- Đăng xuất
-- Giao diện web đơn giản, trực quan
+## Tính năng
 
-##  Công nghệ sử dụng
+- **Authentication**: Đăng ký, đăng nhập, đăng xuất
+- **Password Management**: Thêm, sửa, xóa, xem mật khẩu
+- **Encryption**: Mã hóa mật khẩu với Fernet encryption
+- **Security**: Bcrypt hashing với salt và pepper
+- **User Dashboard**: Quản lý dịch vụ và thống kê
 
-- Python + Flask
-- SQLite + SQLAlchemy
-- Werkzeug Security (hash password)
-- HTML/CSS (Bootstrap)
+## Cài đặt
 
-##  Cấu trúc thư mục
-- app.py: Flask app chính
-- models.py: CSDL - User model_
-- templates/: HTML: login, register, dashboard
-- static/: CSS, ảnh
+1. **Tạo virtual environment:**
+```bash
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+# hoặc
+venv\Scripts\activate     # Windows
+```
 
-# Phân công nhiệm vụ dự án
+2. **Cài đặt dependencies:**
+```bash
+pip install -r requirements.txt
+```
 
-| Thành viên | Vai trò chính                       | Kết quả bàn giao                    |
-|------------|-------------------------------------|-------------------------------------|
-| Người 1    | Logic Flask + kết nối cơ sở dữ liệu | Ứng dụng Flask hoàn chỉnh           |
-| Người 2    | Xử lý hàm băm, salt, bảo mật         | File `hash_utils.py` + các file test |
-| Người 3    | Giao diện web + trải nghiệm người dùng (UX) | Template HTML, CSS               |
-| Người 4    | Lý thuyết, báo cáo                  | Tài liệu Word + Slide thuyết trình  |
+3. **Thiết lập environment variables:**
+Tạo file `.env` với các biến sau:
+```env
+SECRET_KEY=your-secret-key-here
+PASSWORD_PEPPER=your-pepper-here
+DATABASE_URL=sqlite:///password_manager.db
+FLASK_ENV=development
+```
+
+4. **Chạy ứng dụng:**
+```bash
+python run.py
+```
+
+Ứng dụng sẽ chạy tại `http://localhost:5000`
+
+## Cấu trúc Code
+
+### Models
+- **User**: Quản lý thông tin người dùng và authentication
+- **Service**: Quản lý thông tin dịch vụ và mật khẩu được mã hóa
+
+### Services
+- **AuthService**: Xử lý logic authentication
+- **PasswordService**: Xử lý logic quản lý mật khẩu
+
+### Utils
+- **EncryptionService**: Mã hóa/giải mã mật khẩu với Fernet
+- **Password Utils**: Hashing và verification password với bcrypt
+
+### Views (Blueprints)
+- **auth**: Routes cho authentication
+- **dashboard**: Routes cho dashboard và profile
+- **services**: Routes cho quản lý dịch vụ
+
+## Bảo mật
+
+- **Password Hashing**: Sử dụng bcrypt với salt và pepper
+- **Encryption**: Fernet encryption cho mật khẩu dịch vụ
+- **Session Management**: Flask session với secret key
+- **Input Validation**: Kiểm tra và validate input
+- **Soft Delete**: Xóa mềm thay vì xóa cứng dữ liệu
+
+## Development
+
+### Cấu hình Development
+```python
+# app/config/config.py
+class DevelopmentConfig(Config):
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///password_manager.db'
+    FLASK_ENV = 'development'
+```
+
+### Logging
+Ứng dụng sử dụng Python logging để ghi log các hoạt động quan trọng.
+
+### Database
+SQLite được sử dụng cho development. Có thể thay đổi sang PostgreSQL/MySQL cho production.
+
+## Production Deployment
+
+1. **Cấu hình Production:**
+```python
+# app/config/config.py
+class ProductionConfig(Config):
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    FLASK_ENV = 'production'
+```
+
+2. **Environment Variables:**
+- `SECRET_KEY`: Secret key mạnh cho production
+- `PASSWORD_PEPPER`: Pepper key cho password hashing
+- `DATABASE_URL`: URL database production
+
+3. **WSGI Server:**
+Sử dụng Gunicorn hoặc uWSGI để deploy.
+
+## Testing
+
+Chạy tests:
+```bash
+python -m pytest tests/
+```
+
+## Contributing
+
+1. Fork project
+2. Tạo feature branch
+3. Commit changes
+4. Push to branch
+5. Tạo Pull Request
+
+## License
+
+MIT License 

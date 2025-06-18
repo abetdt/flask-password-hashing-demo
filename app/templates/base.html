@@ -70,11 +70,11 @@
     <header>
         <h1>Quản lý mật khẩu</h1>
         {% if session.user_id %}
-            <a href="{{ url_for('dashboard') }}">Dashboard</a> |
-            <a href="{{ url_for('logout') }}">Đăng xuất</a>
+            <a href="{{ url_for('dashboard.index') }}">Dashboard</a> |
+            <a href="{{ url_for('auth.logout') }}">Đăng xuất</a>
         {% else %}
-            <a href="{{ url_for('login') }}">Đăng nhập</a> |
-            <a href="{{ url_for('register') }}">Đăng ký</a>
+            <a href="{{ url_for('auth.login') }}">Đăng nhập</a> |
+            <a href="{{ url_for('auth.register') }}">Đăng ký</a>
         {% endif %}
     </header>
     <main>

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Đăng nhập</h2>
-    <form method="POST" action="{{ url_for('login') }}" onsubmit="return validateLoginForm()">
+    <form method="POST" action="{{ url_for('auth.login') }}" onsubmit="return validateLoginForm()">
         <label for="username">Tên đăng nhập:</label><br>
         <input type="text" id="username" name="username" required><br>
         <span id="username-error" style="color: red; font-size: 13px;"></span><br>
@@ -15,7 +15,7 @@
 
         <button type="submit">Đăng nhập</button>
     </form>
-    <p>Chưa có tài khoản? <a href="{{ url_for('register') }}">Đăng ký</a></p>
+    <p>Chưa có tài khoản? <a href="{{ url_for('auth.register') }}">Đăng ký</a></p>
 
     <script>
         function validateUsername() {

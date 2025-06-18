@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Đăng ký</h2>
-    <form method="POST" action="{{ url_for('register') }}">
+    <form method="POST" action="{{ url_for('auth.register') }}">
         <label for="username">Tên đăng nhập:</label><br>
         <input type="text" id="username" name="username" required minlength="4" maxlength="20" oninput="validateUsername()">
         <p id="username-error" class="error-text"></p>
@@ -27,5 +27,5 @@
         <button type="button" onclick="generatePassword()">Gợi ý mật khẩu</button><br>
         <button type="submit" id="register-btn">Đăng ký</button>
     </form>
-    <p>Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a></p>
+    <p>Đã có tài khoản? <a href="{{ url_for('auth.login') }}">Đăng nhập</a></p>
 {% endblock %}

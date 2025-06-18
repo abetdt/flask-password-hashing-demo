@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Chi tiết dịch vụ: {{ service.service_name }}</h2>
+
+<div class="service-detail">
+    <div class="service-info">
+        <h3>Thông tin dịch vụ</h3>
+        <p><strong>Tên dịch vụ:</strong> {{ service.service_name }}</p>
+        <p><strong>Tên đăng nhập:</strong> {{ service.service_username }}</p>
+        
+        {% if service.service_url %}
+        {% set fixed_url = service.service_url %}
+        {% if not service.service_url.startswith('http') %}
+        {% set fixed_url = 'https://' + service.service_url %}
+        {% endif %}
+        <p><strong>URL:</strong> <a href="{{ fixed_url }}" target="_blank">{{ fixed_url }}</a></p>
+        {% endif %}
+        
+        {% if service.notes %}
+        <p><strong>Ghi chú:</strong> {{ service.notes }}</p>
+        {% endif %}
+        
+        <p><strong>Ngày tạo:</strong> {{ service.created_at.strftime('%d/%m/%Y %H:%M') if service.created_at else 'N/A' }}</p>
+        <p><strong>Cập nhật lần cuối:</strong> {{ service.updated_at.strftime('%d/%m/%Y %H:%M') if service.updated_at else 'N/A' }}</p>
+    </div>
+
+    <div class="password-section">
+        <h3>Mật khẩu</h3>
+        {% if decrypted_password %}
+        <div class="password-display">
+            <input type="password" id="password-field" value="{{ decrypted_password }}" readonly>
+            <button type="button" onclick="togglePasswordVisibility()" id="toggle-btn">Hiển thị</button>
+            <button type="button" onclick="copyPassword()" id="copy-btn">Sao chép</button>
+        </div>
+        {% else %}
+        <p class="error">Không thể giải mã mật khẩu. Vui lòng kiểm tra lại mật khẩu chính.</p>
+        {% endif %}
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('services.edit_service', service_id=service.id) }}" class="btn btn-warning">Chỉnh sửa</a>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">Quay lại Dashboard</a>
+        <form method="POST" action="{{ url_for('services.delete_service', service_id=service.id) }}" style="display: inline;"
+              onsubmit="return confirm('Bạn có chắc chắn muốn xóa dịch vụ {{ service.service_name }}?')">
+            <button type="submit" class="btn btn-danger">Xóa dịch vụ</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .service-detail {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .service-info {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+    }
+
+    .service-info h3 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .service-info p {
+        margin: 10px 0;
+        font-size: 16px;
+    }
+
+    .password-section {
+        background-color: #fff3cd;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ffeaa7;
+    }
+
+    .password-section h3 {
+        margin-top: 0;
+        color: #856404;
+    }
+
+    .password-display {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 15px;
+    }
+
+    .password-display input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 14px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+        transition: opacity 0.2s;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+
+    .error {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordField = document.getElementById('password-field');
+        const toggleBtn = document.getElementById('toggle-btn');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleBtn.textContent = 'Ẩn';
+        } else {
+            passwordField.type = 'password';
+            toggleBtn.textContent = 'Hiển thị';
+        }
+    }
+
+    function copyPassword() {
+        const passwordField = document.getElementById('password-field');
+        const copyBtn = document.getElementById('copy-btn');
+        
+        passwordField.select();
+        passwordField.setSelectionRange(0, 99999); // For mobile devices
+        
+        try {
+            document.execCommand('copy');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Đã sao chép!';
+            copyBtn.style.backgroundColor = '#28a745';
+            
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+                copyBtn.style.backgroundColor = '';
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy password: ', err);
+            alert('Không thể sao chép mật khẩu. Vui lòng thử lại.');
+        }
+    }
+</script>
+{% endblock %}
