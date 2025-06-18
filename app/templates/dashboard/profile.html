@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Hồ sơ người dùng</h2>
+
+<div class="profile-container">
+    <div class="profile-info">
+        <h3>Thông tin cá nhân</h3>
+        <p><strong>Tên đăng nhập:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Ngày tham gia:</strong> {{ user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else 'N/A' }}</p>
+        <p><strong>Cập nhật lần cuối:</strong> {{ user.updated_at.strftime('%d/%m/%Y %H:%M') if user.updated_at else 'N/A' }}</p>
+    </div>
+
+    {% if user_data and user_data.stats %}
+    <div class="profile-stats">
+        <h3>Thống kê</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">{{ user_data.stats.total_services }}</div>
+                <div class="stat-label">Tổng dịch vụ</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ user_data.stats.active_services }}</div>
+                <div class="stat-label">Dịch vụ hoạt động</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ user_data.stats.account_age_days }}</div>
+                <div class="stat-label">Ngày tham gia</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="profile-actions">
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">Quay lại Dashboard</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary">Đăng xuất</a>
+    </div>
+</div>
+
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .profile-info {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+    }
+
+    .profile-info h3 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .profile-info p {
+        margin: 10px 0;
+        font-size: 16px;
+    }
+
+    .profile-stats {
+        background-color: #e3f2fd;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #bbdefb;
+    }
+
+    .profile-stats h3 {
+        margin-top: 0;
+        color: #1976d2;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin-top: 15px;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number {
+        font-size: 2em;
+        font-weight: bold;
+        color: #1976d2;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+        transition: opacity 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}

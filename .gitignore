@@ -1,2 +1,11 @@
+# Python
+__pycache__/
+*.pyc
+
+# Flask
+instance/
 .env
-instance/users.db
+
+# Virtual Environment
+venv/
+

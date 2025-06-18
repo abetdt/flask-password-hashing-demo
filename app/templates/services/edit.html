@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Chỉnh sửa dịch vụ</h2>
+<form method="POST" action="{{ url_for('services.edit_service', service_id=service.id) }}">
+    <label for="service_name">Tên dịch vụ:</label><br>
+    <input type="text" id="service_name" name="service_name" value="{{ service.service_name }}" required><br><br>
+
+    <label for="service_username">Tên đăng nhập dịch vụ:</label><br>
+    <input type="text" id="service_username" name="service_username" value="{{ service.service_username }}" required><br><br>
+
+    <label for="service_password">Mật khẩu dịch vụ:</label><br>
+    <input type="password" id="service_password" name="service_password" required><br><br>
+
+    <label for="service_url">URL dịch vụ (tùy chọn):</label><br>
+    <input type="text" id="service_url" name="service_url" value="{{ service.service_url or '' }}" placeholder="https://example.com"><br><br>
+
+    <label for="service_note">Ghi chú (tùy chọn):</label><br>
+    <textarea id="service_note" name="service_note" rows="3" cols="50" placeholder="Ghi chú về dịch vụ">{{ service.notes or '' }}</textarea><br><br>
+
+    <button type="submit">Cập nhật dịch vụ</button>
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">Hủy</a>
+</form>
+
+<style>
+    form {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        max-width: 500px;
+        border: 1px solid #ddd;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+        transition: opacity 0.2s;
+        margin-right: 10px;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+</style>
+{% endblock %} 

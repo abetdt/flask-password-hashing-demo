@@ -4,7 +4,7 @@
 <p>Email: {{ user.email }}</p>
 
 <h3>Thêm dịch vụ mới</h3>
-<form method="POST" action="{{ url_for('add_service') }}">
+<form method="POST" action="{{ url_for('services.add_service') }}">
     <label for="service_name">Tên dịch vụ:</label><br>
     <input type="text" id="service_name" name="service_name" required><br><br>
 
@@ -25,9 +25,9 @@
 </form>
 
 <h3>Dịch vụ đã lưu</h3>
-{% if user.services %}
+{% if services %}
 <div class="services-list">
-    {% for service in user.services if service.is_active %}
+    {% for service in services %}
     <div class="service-item">
         <div class="service-info">
             <h4>{{ service.service_name }}</h4>
@@ -47,9 +47,9 @@
             {% endif %}
         </div>
         <div class="service-actions">
-            <a href="{{ url_for('service_detail', service_id=service.id) }}" class="btn btn-info">Xem chi tiết</a>
-            <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-warning">Chỉnh sửa</a>
-            <form method="POST" action="{{ url_for('delete_service', service_id=service.id) }}" style="display: inline;"
+            <a href="{{ url_for('services.service_detail', service_id=service.id) }}" class="btn btn-info">Xem chi tiết</a>
+            <a href="{{ url_for('services.edit_service', service_id=service.id) }}" class="btn btn-warning">Chỉnh sửa</a>
+            <form method="POST" action="{{ url_for('services.delete_service', service_id=service.id) }}" style="display: inline;"
                 onsubmit="return confirm('Bạn có chắc chắn muốn xóa dịch vụ {{ service.service_name }}?')">
                 <button type="submit" class="btn btn-danger">Xóa</button>
             </form>
@@ -62,7 +62,7 @@
 {% endif %}
 
 <br>
-<a href="{{ url_for('logout') }}" class="btn btn-secondary">Đăng xuất</a>
+<a href="{{ url_for('auth.logout') }}" class="btn btn-secondary">Đăng xuất</a>
 
 <style>
     form {
