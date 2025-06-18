@@ -151,6 +151,16 @@ Chạy tests:
 ```bash
 python -m pytest tests/
 ```
+## Phân công công việc nhóm
+
+| Thành viên | Vai trò chính | Thư mục phụ trách | Công việc cụ thể | Cần tìm hiểu thêm |
+|------------|---------------|-------------------|------------------|-------------------|
+| **Người 1** | Backend chính *(models + services)* | `models/`, `services/`, `utils/` | - Viết và quản lý các model (user, service,...)<br>- Viết các service xử lý logic (`auth_service.py`, `password_service.py`,...)<br>- Xử lý `utils/` (mã hóa, xử lý mật khẩu,...)<br>- Viết test cho các service và logic nghiệp vụ | - `SQLAlchemy / ORM`<br>- `Clean code`, `Service layer`<br>- Unit test cơ bản |
+| **Người 2** | Web routing + views *(Controller logic)* | `views/`, phối hợp `services/` | - Tạo và quản lý các route (`auth.py`, `dashboard.py`, `services.py`...)<br>- Gọi đến service và trả dữ liệu cho template<br>- Đảm bảo route đúng quy trình đăng nhập, xử lý form | - Flask routing, blueprint<br>- HTTP request/response<br>- Session, redirect, flash message |
+| **Người 3** | Frontend giao diện | `templates/`, `static/` | - Thiết kế UI trong `templates/` (HTML + Jinja2)<br>- Giao diện đăng ký, đăng nhập, dashboard, profile,...<br>- Style với CSS và xử lý JavaScript đơn giản nếu có | - HTML/CSS + Bootstrap (nếu dùng)<br>- Jinja2 templating<br>- Responsive layout |
+| **Người 4** | DevOps + cấu hình + quản lý config | `config/`, `instance/`, `.env`, `run.py`, `test/` | - Cấu hình Flask app, môi trường<br>- Thiết lập `.env`, `.gitignore`, `requirements.txt`<br>- Viết tài liệu `README.md` cho dự án<br>- *(Tuỳ năng lực)* viết test hoặc CI/CD (VD: GitHub Actions) | - Flask config & env<br>- Git & GitHub quản lý code team<br>- Virtualenv, pip, deploy đơn giản |
+
+
 
 ## Contributing
 
