@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Đăng ký</h2>
+    <form method="POST" action="{{ url_for('register') }}">
+        <label for="username">Tên đăng nhập:</label><br>
+        <input type="text" id="username" name="username" required minlength="4" maxlength="20" oninput="validateUsername()">
+        <p id="username-error" class="error-text"></p>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required oninput="validateEmail()">
+        <p id="email-error" class="error-text"></p>
+
+        <label for="password">Mật khẩu:</label><br>
+        <div style="position: relative;">
+            <input type="password" id="password" name="password" required oninput="checkPassword()">
+            <button type="button" id="toggle-password" onclick="togglePassword('password', 'toggle-password')">Hiển thị</button>
+        </div>
+        <p id="password-strength"></p>
+        
+        <label for="confirm-password">Nhập lại mật khẩu:</label><br>
+        <div style="position: relative;">
+            <input type="password" id="confirm-password" name="confirm-password" required oninput="checkPasswordMatch()">
+            <button type="button" id="toggle-confirm-password" onclick="togglePassword('confirm-password', 'toggle-confirm-password')">Hiển thị</button>
+        </div>
+        <p id="password-match"></p>
+        
+        <button type="button" onclick="generatePassword()">Gợi ý mật khẩu</button><br>
+        <button type="submit" id="register-btn">Đăng ký</button>
+    </form>
+    <p>Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a></p>
+{% endblock %}

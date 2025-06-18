@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Chào {{ user.username }}!</h2>
+<p>Email: {{ user.email }}</p>
+
+<h3>Thêm dịch vụ mới</h3>
+<form method="POST" action="{{ url_for('add_service') }}">
+    <label for="service_name">Tên dịch vụ:</label><br>
+    <input type="text" id="service_name" name="service_name" required><br><br>
+
+    <label for="service_username">Tên đăng nhập dịch vụ:</label><br>
+    <input type="text" id="service_username" name="service_username" required><br><br>
+
+    <label for="service_password">Mật khẩu dịch vụ:</label><br>
+    <input type="password" id="service_password" name="service_password" required><br><br>
+
+    <label for="service_url">URL dịch vụ (tùy chọn):</label><br>
+    <input type="text" id="service_url" name="service_url" placeholder="https://example.com"><br><br>
+
+    <label for="service_note">Ghi chú (tùy chọn):</label><br>
+    <textarea id="service_note" name="service_note" rows="3" cols="50"
+        placeholder="Ghi chú về dịch vụ"></textarea><br><br>
+
+    <button type="submit">Thêm dịch vụ</button>
+</form>
+
+<h3>Dịch vụ đã lưu</h3>
+{% if user.services %}
+<div class="services-list">
+    {% for service in user.services if service.is_active %}
+    <div class="service-item">
+        <div class="service-info">
+            <h4>{{ service.service_name }}</h4>
+            <p><strong>Tên đăng nhập:</strong> {{ service.service_username }}</p>
+            {% if service.service_url %}
+            {% set fixed_url = service.service_url %}
+            {% if not service.service_url.startswith('http') %}
+            {% set fixed_url = 'https://' + service.service_url %}
+            {% endif %}
+            <p><strong>URL:</strong>
+                <a href="{{ fixed_url }}" target="_blank">{{ fixed_url }}</a>
+            </p>
+            {% endif %}
+
+            {% if service.notes %}
+            <p><strong>Ghi chú:</strong> {{ service.notes }}</p>
+            {% endif %}
+        </div>
+        <div class="service-actions">
+            <a href="{{ url_for('service_detail', service_id=service.id) }}" class="btn btn-info">Xem chi tiết</a>
+            <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-warning">Chỉnh sửa</a>
+            <form method="POST" action="{{ url_for('delete_service', service_id=service.id) }}" style="display: inline;"
+                onsubmit="return confirm('Bạn có chắc chắn muốn xóa dịch vụ {{ service.service_name }}?')">
+                <button type="submit" class="btn btn-danger">Xóa</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Chưa có dịch vụ nào được lưu.</p>
+{% endif %}
+
+<br>
+<a href="{{ url_for('logout') }}" class="btn btn-secondary">Đăng xuất</a>
+
+<style>
+    form {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        max-width: 500px;
+        border: 1px solid #ddd;
+    }
+
+    .services-list {
+        margin-top: 20px;
+    }
+
+    .service-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 15px 0;
+        background-color: #f9f9f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .service-info {
+        flex: 1;
+        margin-right: 20px;
+    }
+
+    .service-info h4 {
+        margin: 0 0 10px 0;
+        color: #333;
+        font-size: 18px;
+    }
+
+    .service-info p {
+        margin: 8px 0;
+        font-size: 14px;
+    }
+
+    .service-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 120px;
+    }
+
+    /* Form xóa không có margin/padding */
+    .service-actions form {
+        background: none;
+        padding: 0;
+        margin: 0;
+        border: none;
+        max-width: none;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+        transition: opacity 0.2s;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 style="text-align:center; margin-bottom: 24px;">Chi tiết dịch vụ</h2>
+
+<div class="service-detail-card">
+    <div class="service-header">
+        <div class="service-icon">
+            <span style="font-size:2rem; color:#007bff;"><i class="fas fa-key"></i></span>
+        </div>
+        <div>
+            <h3 class="service-title">{{ service.service_name }}</h3>
+            {% if service.service_url %}
+            {% set fixed_url = service.service_url %}
+            {% if not service.service_url.startswith('http') %}
+            {% set fixed_url = 'https://' + service.service_url %}
+            {% endif %}
+            <a href="{{ fixed_url }}" target="_blank" class="service-url">
+                <i class="fas fa-link"></i> {{ fixed_url }}
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="service-info-list">
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-user"></i> Tên đăng nhập:</span>
+            <span class="info-value">{{ service.service_username }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-lock"></i> Mật khẩu:</span>
+            <span class="info-value">
+                <span id="password-display">••••••••</span>
+                <span class="password-actions">
+                    <button type="button" id="toggle-password" onclick="toggleServicePassword()">Hiện</button>
+                    <button type="button" onclick="copyServicePassword()">Sao chép</button>
+                </span>
+            </span>
+        </div>
+        {% if service.notes %}
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-sticky-note"></i> Ghi chú:</span>
+            <span class="info-value">
+                <div class="note-content">{{ service.notes }}</div>
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('edit_service', service_id=service.id) }}" class="btn btn-primary">Chỉnh sửa</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Quay lại</a>
+        <form method="POST" action="{{ url_for('delete_service', service_id=service.id) }}" style="display: inline;"
+            onsubmit="return confirm('Bạn có chắc chắn muốn xóa dịch vụ {{ service.service_name }}?')">
+            <button type="submit" class="btn btn-danger">Xóa</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let servicePasswordVisible = false;
+    const actualServicePassword = "{{ decrypted_password }}";
+
+    function toggleServicePassword() {
+        const passwordDisplay = document.getElementById('password-display');
+        const toggleButton = document.getElementById('toggle-password');
+
+        if (servicePasswordVisible) {
+            passwordDisplay.textContent = '••••••••';
+            toggleButton.textContent = 'Hiện';
+            servicePasswordVisible = false;
+        } else {
+            passwordDisplay.textContent = actualServicePassword;
+            toggleButton.textContent = 'Ẩn';
+            servicePasswordVisible = true;
+        }
+    }
+
+    function copyServicePassword() {
+        navigator.clipboard.writeText(actualServicePassword).then(function () {
+            alert('Đã sao chép mật khẩu dịch vụ!');
+        }).catch(function () {
+            const textArea = document.createElement('textarea');
+            textArea.value = actualServicePassword;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Đã sao chép mật khẩu dịch vụ!');
+        });
+    }
+</script>
+
+<style>
+    .service-detail-card {
+        max-width: 540px;
+        margin: 0 auto;
+        padding: 28px 28px 20px 28px;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        background-color: #f0f4f8;
+        /* hoặc thử #f0f4f8, #f9fafb, #f7f7fc */
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .service-header {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 18px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 12px;
+    }
+
+    .service-title {
+        margin: 0;
+        font-size: 1.4rem;
+        color: #007bff;
+        font-weight: 600;
+    }
+
+    .service-url {
+        font-size: 0.98rem;
+        color: #555;
+        word-break: break-all;
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+    .service-url i {
+        color: #007bff;
+        margin-right: 4px;
+    }
+
+    .service-info-list {
+        margin-top: 18px;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 14px;
+        gap: 8px;
+
+        padding: 14px 0;
+        border-top: 1px solid #e0e4ea;
+        padding-left: 8px;
+        padding-right: 8px;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        margin-top: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        border-left: 4px solid #007bff;
+        border-bottom: 1px solid #e0e4ea;
+
+    }
+
+    .info-label {
+        min-width: 140px;
+        color: #666;
+        font-weight: 500;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .info-value {
+        flex: 1;
+        font-size: 1rem;
+        color: #222;
+        word-break: break-all;
+        padding-left: 8px;
+        display: flex;
+        align-items: center;
+    }
+
+    .note-content {
+        background-color: #fafafa;
+        padding: 8px 12px;
+        border: 1px solid #e5e5e5;
+        border-radius: 4px;
+        margin-top: 2px;
+        white-space: pre-wrap;
+        font-size: 0.98rem;
+        color: #444;
+    }
+
+    .password-actions {
+        display: inline-flex;
+        gap: 8px;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+
+    #toggle-password,
+    button[onclick="copyServicePassword()"] {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-left: 0;
+        transition: background 0.2s;
+    }
+
+    #toggle-password:hover,
+    button[onclick="copyServicePassword()"]:hover {
+        background-color: #218838;
+    }
+
+    .actions {
+        margin-top: 28px;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .actions form {
+        display: inline;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        margin: 0 2px;
+        text-decoration: none;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    @media (max-width: 600px) {
+        .service-detail-card {
+            padding: 14px 4vw;
+        }
+
+        .service-header {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .info-label {
+            min-width: 90px;
+            font-size: 0.97rem;
+        }
+
+        .info-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        .info-value {
+            padding-left: 0;
+        }
+
+        .actions {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+{% endblock %}
